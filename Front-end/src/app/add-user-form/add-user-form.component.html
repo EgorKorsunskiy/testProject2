@@ -1,0 +1,49 @@
+  <h2>Create new User!</h2>
+  <div>
+  <mat-form-field appearance="fill">
+     <mat-label>First Name</mat-label>
+    <input matInput [(ngModel)]='firstName' required (input)='checkForm(firstName,lastName,job,maritalStatusValue,adress,genderValue,hobby,OKbutton,Wrongbutton)'>
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="fill">
+      <mat-label>Last Name</mat-label>
+      <input matInput [(ngModel)]='lastName' required (input)='checkForm(firstName,lastName,job,maritalStatusValue,adress,genderValue,hobby,OKbutton,Wrongbutton)'>
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="fill">
+      <mat-label>Job</mat-label>
+      <input matInput [(ngModel)]='job' required (input)='checkForm(firstName,lastName,job,maritalStatusValue,adress,genderValue,hobby,OKbutton,Wrongbutton)'>
+    </mat-form-field>
+    <br>
+  <mat-form-field appearance="fill">
+      <mat-label>Select your Marital status</mat-label>
+        <mat-select [(ngModel)]="maritalStatusValue" name="maritalStatus" required>
+          <mat-option *ngFor="let el of maritalStatus" [value]="el.value" (click)='checkForm(firstName,lastName,job,maritalStatusValue,adress,genderValue,hobby,OKbutton,Wrongbutton)'>
+           {{el.value}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+  <br>
+  <mat-form-field appearance="fill">
+      <mat-label>Adress</mat-label>
+      <input matInput [(ngModel)]='adress' required (input)='checkForm(firstName,lastName,job,maritalStatusValue,adress,genderValue,hobby,OKbutton,Wrongbutton)'>
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="fill">
+      <mat-label>Select your gender</mat-label>
+        <mat-select [(ngModel)]="genderValue" name="gender" required>
+          <mat-option *ngFor="let el of gender" [value]="el.value" (click)='checkForm(firstName,lastName,job,maritalStatusValue,adress,genderValue,hobby,OKbutton,Wrongbutton)'>
+            {{el.value}}
+          </mat-option>
+      </mat-select>
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="fill">
+    <mat-label>Hobby</mat-label>
+    <textarea matInput [(ngModel)]='hobby' required (input)='checkForm(firstName,lastName,job,maritalStatusValue,adress,genderValue,hobby,OKbutton,Wrongbutton)'></textarea>
+  </mat-form-field>
+  </div>
+  <div>
+      <button mat-button color="primary" [mat-dialog-close]="[firstName,lastName,job,maritalStatusValue,adress,genderValue,hobby]" class="hidden" appClassToggle #OKbutton='classToggle'>Create</button>
+      <button mat-button disabled appClassToggle #Wrongbutton='classToggle'>Create</button>
+  </div>

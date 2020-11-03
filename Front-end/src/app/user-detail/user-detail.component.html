@@ -1,0 +1,75 @@
+<div class="body" *ngIf="$users | async; else elseBlock">
+    <mat-card class="card-container" *ngFor="let user of $users | async">
+        <mat-card-header class="header-container">
+            <mat-card-title>Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="card-content">
+        <div class="card_short_information-container">
+            <p appClassToggle #FirstName='classToggle'>First Name: &nbsp;</p>
+            <p appClassToggle #FirstNameInfo='classToggle'>{{user.first_name}}</p>
+            <input type="text" class="edit-input hidden" appClassToggle #FirstNameEditInput='classToggle'>
+            <button mat-button class="edit-button lower_right_pencil hidden" appClassToggle #FirstNameEditButton='classToggle' (click)="toggleInputP(FirstNameInfo,FirstNameEditInput);changeButtonValue(FirstName, FirstNameInfo, FirstNameEditButton, FirstNameEditInput)"></button>
+        </div>
+        <div class="card_short_information-container">
+            <p appClassToggle #LastName='classToggle'>Last Name: &nbsp;</p>
+            <p appClassToggle #LastNameInfo='classToggle'>{{user.last_name}}</p>
+            <input type="text" class="edit-input hidden" appClassToggle #LastNameEditInput='classToggle'>
+            <button mat-button class="edit-button lower_right_pencil hidden" appClassToggle #LastNameEditButton='classToggle' (click)="toggleInputP(LastNameInfo,LastNameEditInput);changeButtonValue(LastName, LastNameInfo, LastNameEditButton, LastNameEditInput)"></button>
+        </div>
+        <div class="card_short_information-container">
+            <p appClassToggle #Job='classToggle'>Job: &nbsp;</p>
+            <p appClassToggle #JobInfo='classToggle'>{{user.job}}</p>
+            <input type="text" class="edit-input hidden" appClassToggle #JobEditInput='classToggle'>
+            <button mat-button class="edit-button lower_right_pencil hidden" appClassToggle #JobEditButton='classToggle' (click)="toggleInputP(JobInfo,JobEditInput);changeButtonValue(Job, JobInfo, JobEditButton, JobEditInput)"></button>
+        </div>
+        <div class="card_short_information-container">
+            <p appClassToggle #MaritalStatus='classToggle'>Marital status: &nbsp;</p>
+            <mat-form-field appearance="fill" class="hidden" appClassToggle #MaritalStatusEditInput='classToggle'>
+                <mat-label>Select your marital status</mat-label>
+                 <mat-select [(ngModel)]="maritalStatusSelectedValue" name="maritalStatusSelect">
+                   <mat-option *ngFor="let el of maritalStatusSelect" [value]="el.value">
+                     {{el.value}}
+                   </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <p appClassToggle #MaritalStatusInfo='classToggle'>{{maritalStatusSelectedValue}}</p>
+            <button mat-button class="edit-button lower_right_pencil hidden" appClassToggle #MaritalStatusEditButton='classToggle' (click)="toggleInputP(MaritalStatusInfo,MaritalStatusEditInput);changeButtonValue(MaritalStatus, MaritalStatusInfo, MaritalStatusEditButton, maritalStatusSelectedValue)"></button>
+        </div>
+        <div class="card_short_information-container">
+            <p appClassToggle #Adress='classToggle'>Adress: &nbsp;</p>
+            <p appClassToggle #AdressInfo='classToggle'>{{user.adress}}</p>
+            <input type="text" class="edit-input hidden" appClassToggle #AdressEditInput='classToggle'>
+            <button mat-button class="edit-button lower_right_pencil hidden" appClassToggle #AdressEditButton='classToggle' (click)="toggleInputP(AdressInfo,AdressEditInput);changeButtonValue(Adress, AdressInfo, AdressEditButton, AdressEditInput)"></button>
+        </div>
+        <div class="card_short_information-container">
+            <p appClassToggle #Gender='classToggle'>Gender: &nbsp;</p>
+             <mat-form-field appearance="fill" class="hidden" appClassToggle #GenderEditInput='classToggle'>
+               <mat-label>Select your gender</mat-label>
+                <mat-select [(ngModel)]="genderSelectedValue" name="genderSelect">
+                  <mat-option *ngFor="let el of genderSelect" [value]="el.value">
+                    {{el.value}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            <p appClassToggle #GenderInfo='classToggle'>{{genderSelectedValue}}</p>
+            <button mat-button class="edit-button lower_right_pencil hidden" appClassToggle #GenderEditButton='classToggle' (click)="toggleInputP(GenderInfo,GenderEditInput);changeButtonValue(Gender, GenderInfo, GenderEditButton, genderSelectedValue)"></button>
+        </div>
+        <div class="card_short_information-container">
+            <p appClassToggle #Hobby='classToggle'>Hobby: &nbsp;</p>
+            <p appClassToggle #HobbyInfo='classToggle'>{{user.hobby}}</p>
+            <textarea type="text" class="edit-textArea hidden" appClassToggle #HobbyEditInput='classToggle'></textarea>
+            <button mat-button class="edit-button lower_right_pencil hidden" appClassToggle #HobbyEditButton='classToggle' (click)="toggleInputP(HobbyInfo,HobbyEditInput);changeButtonValue(Hobby, HobbyInfo, HobbyEditButton, HobbyEditInput)"></button>
+        </div>
+        <mat-card-actions class="card-actions">
+            <button mat-button [routerLink]="['/']">Back</button>
+            <div>
+                <button mat-button (click)="toggleEditButtons($event.target, [FirstNameEditButton, LastNameEditButton, JobEditButton, MaritalStatusEditButton, AdressEditButton, GenderEditButton, HobbyEditButton])">Edit</button>
+                <button mat-button (click)="deleteUser(user.id)">Delete</button>
+            </div>
+        </mat-card-actions>
+        </mat-card-content>
+    </mat-card>
+</div>
+<ng-template #elseBlock>
+    <mat-spinner></mat-spinner>
+</ng-template>
