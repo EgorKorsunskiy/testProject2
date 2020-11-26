@@ -16,13 +16,13 @@ export class User {
     job:string;
 
     @Column()
-    marital_status:string;
+    marital_status:MaritalStatus;
 
     @Column()
     adress: string;
 
     @Column()
-    gender:string;
+    gender:Gender;
 
     @Column()
     hobby:string;

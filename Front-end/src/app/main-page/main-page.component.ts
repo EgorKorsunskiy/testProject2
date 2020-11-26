@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
 import { Observable, of } from 'rxjs';
-import { PutDto } from 'src/assets/Interfaces/Dto';
+import { PatchDto } from 'src/assets/Interfaces/Dto';
 import { Select } from 'src/assets/Interfaces/SelectType';
 import { IUser } from 'src/assets/Interfaces/UserObject';
 import { AddUserFormComponent } from '../add-user-form/add-user-form.component';
@@ -15,8 +15,6 @@ import { MainPageService } from '../Services/main-page.service';
   styleUrls: ['./main-page.component.css']
 })
 export class MainPageComponent implements OnInit{
-  @ViewChild('addContainer') addContainerEl:ClassToggleDirective;
-  @ViewChild('paginator') paginatorEl:ClassToggleDirective;
 
   public isAllFields:boolean = true;
   public $users:Observable<IUser[]>;
@@ -25,7 +23,9 @@ export class MainPageComponent implements OnInit{
   public pageSize:number = 10;
   public pageIndex:number = 1;
   public pageSizeOptions:Array<number> = [5, 10, 25, 100];
-  public changeObject:PutDto = {};
+  public changeObject:PatchDto = {
+    updated_data:[]
+  };
   public maritalStatusSelectedValue:string;
   public maritalStatusSelect:Select[] = [
     {value:'Married'},
@@ -35,21 +35,18 @@ export class MainPageComponent implements OnInit{
     {value:'Single'}
   ]
 
-  constructor(private _http:HttpClient, private _mainPageService:MainPageService, private _dialog:MatDialog) { }
+  constructor(private _mainPageService:MainPageService, private _dialog:MatDialog) { }
 
   ngOnInit(): void {
-    let url:string = 'http://localhost:3000/users/getAll';
-
-    this.MakeRequest(url);
+    this.MakeRequest();
   }
 
   showCreateUserForm():void{
     let dialogRef = this.openWindow();
 
     dialogRef.afterClosed().subscribe(data => {
-      
+  
 
-      let url:string = 'http://localhost:3000/users/create';
       let PostObject:IUser = {
         first_name: data[0],
         last_name:data[1],
@@ -59,7 +56,16 @@ export class MainPageComponent implements OnInit{
         gender:data[5],
         hobby:data[6]
       }
-      this._mainPageService.MakePostRequest(url, JSON.stringify(PostObject))
+      this._mainPageService.MakePostRequest(PostObject)
+      .subscribe(_ => {},
+        err => {
+          if(err.status == 400){
+            alert(err.error.message.join('\n'));
+          }
+          else if(err.status == 500){
+            alert('Something went wrong!');
+          }
+        })
     })
   }
 
@@ -78,9 +84,17 @@ export class MainPageComponent implements OnInit{
     }
     else{
       target.innerText = 'Edit';
-      let url: string = 'http://localhost:3000/users/patch';
-      this._mainPageService.MakePatchRequest(url, JSON.stringify(this.changeObject));
-      this.changeObject = {};
+      this._mainPageService.MakePatchRequest(this.changeObject)
+      .subscribe(_ => {},
+        err => {
+          if(err.status == 400){
+            alert(err.error.message.join('\n'));
+          }
+          else if(err.status == 500){
+            alert('Something went wrong!');
+          }
+        });
+      this.changeObject.updated_data = [];
     }
   }
 
@@ -107,21 +121,15 @@ export class MainPageComponent implements OnInit{
       this.changeInfoText(info, inputValue);
 
       this.changeObject.user_id = user_id;
-      try{
-        this.changeObject.updated_data.push({
-          name: name.thisElement().innerText.slice(0,-3),
-          value: inputValue
-        })
-      }
-      catch{
-      this.changeObject.updated_data = [{
-          name: name.thisElement().innerText.slice(0,-3),
-          value: inputValue
-      }] 
-    }
-    finally{
+      this.changeObject.updated_data.push({
+        target: name.thisElement().innerText.slice(0,-3)
+        .toLowerCase()
+        .split(' ')
+        .join('_'),
+        value: inputValue
+      })
+
       this.isAllFields = true;
-    }
     }
   }
 
@@ -135,13 +143,21 @@ export class MainPageComponent implements OnInit{
     }
   }
 
-  MakeRequest(url:string):void{
+  MakeRequest():void{
 
-    this._mainPageService.MakeGetRequestMany(url)
+    this._mainPageService.MakeGetRequestMany()
     .subscribe(data => {
       this.$users = of(data);
       this.$CurrentPageUsers = of(this.sliceUsers(data));
       this.usersCount = data.length;
+    },
+    err => {
+      if(err.status == 400){
+        alert(err.error.message.join('\n'));
+      }
+      else if(err.status == 500){
+        alert('Something went wrong!');
+      }
     })
   }
 
@@ -160,8 +176,8 @@ export class MainPageComponent implements OnInit{
     }) 
   }
 
-  changePage(event):void{
-    this.pageIndex = event.pageIndex?event.pageIndex:event.pageIndex + 1;
+  changePage(event:PageEvent):void{
+    this.pageIndex = event.pageIndex + 1;
     this.pageSize = event.pageSize;
 
     this.$users.subscribe(data => {

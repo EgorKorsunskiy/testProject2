@@ -2,33 +2,40 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IUser } from 'src/assets/Interfaces/UserObject';
+import { PatchDto } from 'src/assets/Interfaces/Dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MainPageService {
 
+  private GetManyUrl: string = 'http://localhost:3000/users/getAll';
+  private GetOneUrl: string = 'http://localhost:3000/users/getOne/';
+  private PostUrl: string = 'http://localhost:3000/users/create';
+  private DeleteUrl: string = 'http://localhost:3000/users/delete/';
+  private PatchUrl: string = 'http://localhost:3000/users/patch';
+
   constructor(private _http:HttpClient) {}
 
-  MakeGetRequestMany(url: string): Observable<IUser[]>{
-    return this._http.get<IUser[]>(url);
+  MakeGetRequestMany(): Observable<IUser[]>{
+    return this._http.get<IUser[]>(this.GetManyUrl);
   }
 
-  MakeGetRequestOne(url:string): Observable<IUser>{
-    return this._http.get<IUser>(url);
+  MakeGetRequestOne(id:number): Observable<IUser>{
+    return this._http.get<IUser>(`${this.GetOneUrl}${id}`);
   }
 
-  MakePostRequest(url:string, body:string){
+  MakePostRequest(body:IUser){
     let headers = new HttpHeaders().set('Content-Type', 'application/json')
-    this._http.post(url,body, {headers}).subscribe();
+    return this._http.post(this.PostUrl,JSON.stringify(body), {headers});
   }
 
-  MakeDeleteRequest(url:string){
-    this._http.delete(url).subscribe();
+  MakeDeleteRequest(id:number){
+    return this._http.delete(`${this.DeleteUrl}${id}`);
   }
 
-  MakePatchRequest(url:string, data:string){
+  MakePatchRequest(body:PatchDto){
     let headers = new HttpHeaders().set('Content-Type', 'application/json')
-    this._http.patch(url, data, {headers}).subscribe();
+    return this._http.patch(this.PatchUrl, JSON.stringify(body), {headers});
   }
 }

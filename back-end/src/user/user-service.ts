@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateGetUserDto, PatchUserDto } from 'src/assets/interfaces/DTO';
 import { Repository } from 'typeorm';
 import { User } from '../assets/entities/user-entity';
 
@@ -16,11 +17,11 @@ export class UserService {
     return await this.usersRepository.find();
   }
 
-  async findOne(id): Promise<User> {
+  async findOne(id:number): Promise<User> {
     return await this.usersRepository.findOne(id)
   }
 
-  createUser(data){
+  createUser(data:CreateGetUserDto){
     let user = new User();
 
     user.first_name = data['first_name'];
@@ -33,47 +34,16 @@ export class UserService {
     this.usersRepository.save(user);
   }
 
-  delete(id){
+  delete(id:number){
     this.usersRepository.delete(id);
   }
 
-  patch(data:JSON){
+  patch(data:PatchUserDto){
+    let updatedData = {};
+
     data['updated_data'].forEach(el => {
-      if(el['name'] == 'First_name'){
-        this.usersRepository.update(data['user_id'], {
-          first_name:el['value']
-        })
-      }
-      else if(el['name'] == 'Last_name'){
-        this.usersRepository.update(data['user_id'], {
-          last_name:el['value']
-        })
-      }
-      else if(el['name'] == 'Job'){
-        this.usersRepository.update(data['user_id'], {
-          job:el['value']
-        })
-      }
-      else if(el['name'] == 'Marital status'){
-        this.usersRepository.update(data['user_id'], {
-          marital_status:el['value']
-        })
-      }
-      else if(el['name'] == 'Adress'){
-        this.usersRepository.update(data['user_id'], {
-          adress:el['value']
-        })
-      }
-      else if(el['name'] == 'Gender'){
-        this.usersRepository.update(data['user_id'], {
-          gender:el['value']
-        })
-      }
-      else if(el['name'] == 'Hobby'){
-        this.usersRepository.update(data['user_id'], {
-          hobby:el['value']
-        })
-      }
-    });
+      updatedData[el["target"]] = el["value"];
+    })
+    this.usersRepository.update(data['user_id'], updatedData);
   }
 }

@@ -1,14 +1,19 @@
 export const enum Marital_status {
-    'Married',
-    'Widowed',
-    'Separated',
-    'Divorced',
-    'Single'
+    'Married'='Married',
+    'Widowed'='Widowed',
+    'Separated'='Separated',
+    'Divorced'='Divorced',
+    'Single'='Single'
 }
 
 export const enum Gender {
-    'Male',
-    'Female'
+    'Male'='Male',
+    'Female'='Female'
+}
+
+export interface IUpdatedData {
+    target:string;
+    value:string
 }
 
 export interface IUser {

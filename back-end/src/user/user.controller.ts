@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
 import { User } from 'src/assets/entities/user-entity';
+import { CreateGetUserDto, PatchUserDto } from 'src/assets/interfaces/DTO';
 import { UserService } from './user-service';
 
 @Controller('users')
@@ -8,21 +9,36 @@ export class UserController {
 
     @Get('getAll')
     findAll(): Promise<User[]>{
-        return this.userService.findAll();
+        const users = this.userService.findAll();
+
+        if(!users){
+            throw new NotFoundException()
+        }
+        return users;
     }
 
     @Get('getAll/:count')
     find(@Param('count') count): Promise<User[]>{
-        return this.userService.findAll(count);
+        const users = this.userService.findAll(count);
+
+        if(!users){
+            throw new NotFoundException()
+        }
+        return users;
     }
 
     @Get('getOne/:id')
     findOne(@Param('id') id):Promise<User>{
-        return this.userService.findOne(id);
+        const users = this.userService.findOne(id);
+
+        if(!users){
+            throw new NotFoundException()
+        }
+        return users;
     }
 
     @Post('create')
-    createUser(@Body() Body:JSON){
+    createUser(@Body() Body:CreateGetUserDto){
         this.userService.createUser(Body)
     }
 
@@ -32,7 +48,7 @@ export class UserController {
     }
     
     @Patch('patch')
-    putUpdatedData(@Body() Body:JSON){
+    putUpdatedData(@Body() Body:PatchUserDto){
         this.userService.patch(Body);
     }
 }

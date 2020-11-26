@@ -1,9 +1,6 @@
-interface updated_data {
-    name:string;
-    value:string;
-}
+import { IUpdatedData } from './UserObject';
 
-export interface PutDto{
+export interface PatchDto{
     user_id?:number;
-    updated_data?:updated_data[];
+    updated_data?:IUpdatedData[];
 }

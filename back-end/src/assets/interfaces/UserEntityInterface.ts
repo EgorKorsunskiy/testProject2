@@ -1,12 +1,12 @@
-export enum MaritalStatus {
-    'Married',
-    'Widowed',
-    'Separated',
-    'Divorced',
-    'Single'
+export const enum MaritalStatus {
+    'Married'='Married',
+    'Widowed'='Widowed',
+    'Separated'='Separated',
+    'Divorced'='Divorced',
+    'Single'='Single'
 }
 
-export enum Gender {
-    'Male',
-    'Female'
+export const enum Gender {
+    'Male'='Male',
+    'Female'='Female'
 }

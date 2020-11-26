@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { PutDto } from 'src/assets/Interfaces/Dto';
+import { PatchDto } from 'src/assets/Interfaces/Dto';
 import { Select } from 'src/assets/Interfaces/SelectType';
 import { Gender, IUser, Marital_status } from 'src/assets/Interfaces/UserObject';
 import { ClassToggleDirective } from '../Directives/class-toggle.directive';
@@ -29,20 +29,22 @@ export class UserDetailComponent implements OnInit {
   public maritalStatusSelectedValue:Marital_status;
   public genderSelectedValue:Gender;
   public $users:Observable<IUser[]>;
-  public user_id:string;
-  public changeObject:PutDto = {};
+  public user_id:number;
+  public changeObject:PatchDto = {
+    updated_data:[]
+  };
 
   constructor(private _router:Router, private _activatedRoute:ActivatedRoute, private _mainPageService:MainPageService) { }
 
   ngOnInit(): void {
 
     this._activatedRoute.paramMap.subscribe(params => {
-      this.user_id = params.get('id')
+      this.user_id = parseInt(params.get('id'), 10);
     })
 
-    let url:string = `http://localhost:3000/users/getOne/${this.user_id}`;
 
-    this._mainPageService.MakeGetRequestOne(url).subscribe(data => {
+
+    this._mainPageService.MakeGetRequestOne(this.user_id).subscribe(data => {
       let users:IUser[] = [];
       users.push(data);
 
@@ -50,17 +52,29 @@ export class UserDetailComponent implements OnInit {
       this.genderSelectedValue = data.gender;
       this.maritalStatusSelectedValue = data.marital_status;
     },
-    error => {
-      alert('Something went wrong!' + error)
+    err => {
+      if(err.status == 400){
+        alert(err.error.message.join('\n'));
+      }
+      else if(err.status == 500){
+        alert('Something went wrong!');
+      }
     })
   }
 
   deleteUser(id:number):void{
     if(!confirm('Are you sure?')) return;
 
-    let url = `http://localhost:3000/users/delete/${id}`;
-
-    this._mainPageService.MakeDeleteRequest(url);
+    this._mainPageService.MakeDeleteRequest(id)
+    .subscribe(_ => {},
+      err => {
+        if(err.status == 400){
+          alert(err.error.message.join('\n'));
+        }
+        else if(err.status == 500){
+          alert('Something went wrong!');
+        }
+      });
     this._router.navigate(['/'])
   }
 
@@ -79,9 +93,17 @@ export class UserDetailComponent implements OnInit {
     }
     else{
       target.innerText = 'Edit';
-      let url: string = 'http://localhost:3000/users/patch';
-      this._mainPageService.MakePatchRequest(url, JSON.stringify(this.changeObject));
-      this.changeObject = {};
+      this._mainPageService.MakePatchRequest(this.changeObject)
+      .subscribe(_ => {},
+        err => {
+          if(err.status == 400){
+            alert(err.error.message.join('\n'));
+          }
+          else if(err.status == 500){
+            alert('Something went wrong!');
+          }
+        });
+      this.changeObject.updated_data = [];
     }
   }
 
@@ -107,25 +129,19 @@ export class UserDetailComponent implements OnInit {
         this.isAllFields = true;
         return
       }
-      
+
       this.changeInfoText(info, inputValue);
 
-      this.changeObject.user_id = parseInt(this.user_id, 10);
-      try{
-        this.changeObject.updated_data.push({
-          name: name.thisElement().innerText.slice(0,-3),
-          value: inputValue
-        })
-      }
-      catch{
-      this.changeObject.updated_data = [{
-          name: name.thisElement().innerText.slice(0,-3),
-          value: inputValue
-      }] 
-    }
-    finally{
+      this.changeObject.user_id = this.user_id, 10;
+      this.changeObject.updated_data.push({
+        target: name.thisElement().innerText.slice(0,-3)
+        .toLowerCase()
+        .split(' ')
+        .join('_'),
+        value: inputValue
+      })
+
       this.isAllFields = true;
-    }
     }
   }
 
